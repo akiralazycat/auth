@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="A human-centered guide to authentication, recovery, sessions, and account security." />
+  <title>Auth — Human-centered account security</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Auth home"><span class="brand-mark" aria-hidden="true">◌</span><span>auth</span></a>
+    <nav aria-label="Primary navigation">
+      <a href="#principles">Principles</a>
+      <a href="#assurance">Assurance</a>
+      <a href="#recovery">Recovery</a>
+      <a href="#architecture">Architecture</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero shell">
+      <p class="eyebrow">ACCOUNT & IDENTITY DESIGN</p>
+      <h1>Authentication should protect the person, not just the login form.</h1>
+      <p class="lede">A compact design guide for Passkeys, external providers, recovery, sessions, and sensitive account actions. The goal is simple: make strong account security easier to reason about, easier to maintain, and easier for users to understand.</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#principles">Read the principles</a>
+        <a class="button" href="#action-matrix">See the action matrix</a>
+      </div>
+      <div class="boundary-note">
+        <span class="pulse" aria-hidden="true"></span>
+        <p><strong>Open design, isolated implementation.</strong> Share security contracts and proven helpers. Keep product databases, secrets, OAuth clients, Passkey configuration, and session keys separate unless centralization is deliberate.</p>
+      </div>
+    </section>
+
+    <section class="shell intro-grid" aria-label="Core ideas">
+      <article><span class="num">01</span><h2>Identity is not email</h2><p>External identities should be keyed by provider and immutable subject. Matching email addresses are not a safe automatic merge rule.</p></article>
+      <article><span class="num">02</span><h2>Recovery is constrained</h2><p>A recovery link should restore a path to control, not silently mint a fully privileged account session.</p></article>
+      <article><span class="num">03</span><h2>Proof should match risk</h2><p>Routine access, credential changes, and destructive authentication-root actions should not all require the same assurance.</p></article>
+    </section>
+
+    <section id="principles" class="section shell">
+      <div class="section-heading"><p class="eyebrow">PRINCIPLES</p><h2>Twelve rules for a calmer security model.</h2><p>These are behavioral contracts, not framework choices. They should survive changes in UI, database, hosting, and client platform.</p></div>
+      <div class="principle-list">
+        <article><span>01</span><div><h3>Identity is not email.</h3><p>Use provider + immutable subject for external identity. Treat provider email as metadata, not a merge key.</p></div></article>
+        <article><span>02</span><div><h3>Login, linking, and reauthentication are different ceremonies.</h3><p>Bind each flow to an explicit intent, expected session, provider, expiry, and safe return path.</p></div></article>
+        <article><span>03</span><div><h3>Sensitive actions deserve fresh proof.</h3><p>An old browser session should not automatically authorize credential or recovery changes.</p></div></article>
+        <article><span>04</span><div><h3>Never let the user strand themselves.</h3><p>The server should reject any mutation that leaves zero usable sign-in methods.</p></div></article>
+        <article><span>05</span><div><h3>Availability is not independence.</h3><p>Multiple synchronized Passkeys improve resilience but may still share one upstream trust root.</p></div></article>
+        <article><span>06</span><div><h3>Recovery is a constrained state transition.</h3><p>Use a restricted recovery session until sufficient assurance has been rebuilt.</p></div></article>
+        <article><span>07</span><div><h3>Recovery email is not a master key.</h3><p>Inbox access alone should not silently satisfy the strongest destructive-action requirements.</p></div></article>
+        <article><span>08</span><div><h3>Sessions have purpose.</h3><p>Normal, temporary shared-device, recovery, and native sessions should carry explicit capabilities and lifetimes.</p></div></article>
+        <article><span>09</span><div><h3>Active sessions and history are different data.</h3><p>Separate authoritative current access from historical security events.</p></div></article>
+        <article><span>10</span><div><h3>Security should be legible.</h3><p>Show users what can sign in, what is active, what changed, and why stronger proof is required.</p></div></article>
+        <article><span>11</span><div><h3>Web and native share policy.</h3><p>Transport can differ. Assurance, recovery, credential, and revocation semantics should not.</p></div></article>
+        <article><span>12</span><div><h3>Share policy; isolate blast radius.</h3><p>Reuse stable contracts and helpers while keeping product credentials, databases, and cryptographic material isolated.</p></div></article>
+      </div>
+    </section>
+
+    <section id="assurance" class="section tone-band">
+      <div class="shell">
+        <div class="section-heading"><p class="eyebrow">ASSURANCE</p><h2>Three levels are enough to make intent explicit.</h2><p>The labels matter less than the discipline: distinguish an active session, a fresh proof, and independent proof families.</p></div>
+        <div class="assurance-grid">
+          <article><div class="level">A0</div><h3>Active session</h3><p>Allowed current session is sufficient for low-risk operations.</p><ul><li>Example: revoke one other active device</li></ul></article>
+          <article><div class="level">A1</div><h3>Fresh proof</h3><p>One recent credential proof. A ten-minute freshness window is a practical starting point.</p><ul><li>Add or remove one credential</li><li>Link or unlink a provider</li><li>Change recovery email</li></ul></article>
+          <article><div class="level">A2</div><h3>Independent proofs</h3><p>Two eligible proof families for destructive authentication-root changes.</p><ul><li>Remove all Passkeys</li><li>Delete the account</li><li>Release a scarce identity root</li></ul></article>
+        </div>
+
+        <div id="action-matrix" class="matrix-wrap">
+          <div class="matrix-heading"><h3>Sensitive-action matrix</h3><p>A baseline, not a substitute for product-specific threat modeling.</p></div>
+          <div class="table-scroll"><table><thead><tr><th>Action</th><th>Baseline</th><th>Invariant</th></tr></thead><tbody>
+            <tr><td>Normal sign-in</td><td><span class="pill">Credential</span></td><td>Provider subject identifies external account</td></tr>
+            <tr><td>Add Passkey</td><td><span class="pill">A1</span></td><td>Signup and constrained recovery are explicit exceptions</td></tr>
+            <tr><td>Remove one Passkey</td><td><span class="pill">A1</span></td><td>Never remove the final usable method</td></tr>
+            <tr><td>Link / unlink provider</td><td><span class="pill">A1</span></td><td>Explicit intent bound to current account/session</td></tr>
+            <tr><td>Change recovery email</td><td><span class="pill">A1</span></td><td>Verify the new address independently</td></tr>
+            <tr><td>Revoke all other sessions</td><td><span class="pill">A1</span></td><td>Rotate or preserve current trusted session deliberately</td></tr>
+            <tr><td>Remove all Passkeys</td><td><span class="pill strong">A2</span></td><td>Invalidate stale step-up grants</td></tr>
+            <tr><td>Delete account</td><td><span class="pill strong">A2</span></td><td>Destructive confirmation + audit event</td></tr>
+            <tr><td>Recovery replacement</td><td><span class="pill soft">Restricted</span></td><td>Security hold if no independent credential survives</td></tr>
+          </tbody></table></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="recovery" class="section shell">
+      <div class="section-heading"><p class="eyebrow">RECOVERY & SESSIONS</p><h2>Recovery should rebuild control without creating a shortcut around security.</h2></div>
+      <div class="split-grid">
+        <article class="feature-card"><p class="card-kicker">RECOVERY</p><h3>Restricted first, normal later.</h3><p>A recovery link can open a narrow session that inspects credential state, adds a replacement Passkey, or completes a provider reauthentication flow.</p><div class="do-dont"><div><strong>May</strong><span>Inspect credential state</span><span>Add replacement credential</span><span>Continue recovery ceremony</span></div><div><strong>Must not</strong><span>Delete the account</span><span>Change recovery address again</span><span>Remove all credentials</span></div></div></article>
+        <article class="feature-card"><p class="card-kicker">SESSIONS</p><h3>Model purpose explicitly.</h3><div class="session-stack"><div><b>Normal</b><span>Personal-device account session</span></div><div><b>Temporary</b><span>Short, non-sliding, no credential mutation</span></div><div><b>Recovery</b><span>Narrow capabilities for restoring access</span></div><div><b>Native</b><span>Secure token transport, same policy model</span></div></div></article>
+      </div>
+    </section>
+
+    <section id="architecture" class="section architecture-band">
+      <div class="shell architecture-grid">
+        <div class="section-heading"><p class="eyebrow">ARCHITECTURE</p><h2>Share the contract. Keep the failure domains deliberate.</h2><p>Common policy reduces drift. Isolation prevents one product compromise from automatically becoming every product compromise.</p></div>
+        <div class="boundary-grid">
+          <article><p class="card-kicker">GOOD TO SHARE</p><ul><li>Credential semantics</li><li>OAuth intent model</li><li>Step-up policy</li><li>Recovery lifecycle helpers</li><li>Session-kind semantics</li><li>Security-event vocabulary</li><li>Conformance fixtures</li></ul></article>
+          <article><p class="card-kicker">KEEP ISOLATED</p><ul><li>Account databases</li><li>OAuth secrets and private keys</li><li>Passkey RP configuration</li><li>Session and encryption keys</li><li>Cookie domains</li><li>Product migrations</li><li>Product-specific identity rows</li></ul></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section shell checklist">
+      <div class="section-heading"><p class="eyebrow">REVIEW CHECKLIST</p><h2>Before calling an auth flow finished.</h2></div>
+      <div class="check-grid"><p>Does external identity use immutable provider subject?</p><p>Can a callback distinguish login, link, and reauth?</p><p>Can the last usable sign-in method be removed?</p><p>Do sensitive actions require fresh proof?</p><p>Are destructive root changes stronger than routine settings?</p><p>Does recovery create a restricted state first?</p><p>Can temporary sessions mutate credentials?</p><p>Are active sessions distinct from audit history?</p><p>Does native preserve the same action policy?</p><p>Are secrets and relying-party configuration isolated per product?</p></div>
+    </section>
+  </main>
+
+  <footer class="site-footer shell"><p><strong>auth</strong> — an open design guide, not an authentication SDK.</p><p>Security is contextual. Treat these rules as a review baseline, then threat-model your product.</p></footer>
+</body>
+</html>
