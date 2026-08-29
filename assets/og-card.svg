@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">auth — Human-centered account security</title>
+  <desc id="desc">Open Graph source artwork for the auth design guide.</desc>
+  <rect width="1200" height="630" fill="#F4F6F2"/>
+  <rect x="42" y="42" width="1116" height="546" rx="34" fill="none" stroke="#D7DED8" stroke-width="2"/>
+  <text x="86" y="132" fill="#2B6D4F" font-family="ui-sans-serif, system-ui, sans-serif" font-size="28" font-weight="700" letter-spacing="4">ACCOUNT &amp; IDENTITY DESIGN</text>
+  <text x="86" y="245" fill="#18201C" font-family="ui-sans-serif, system-ui, sans-serif" font-size="92" font-weight="720" letter-spacing="-5">auth</text>
+  <text x="86" y="350" fill="#18201C" font-family="ui-sans-serif, system-ui, sans-serif" font-size="43" font-weight="560">Human-centered authentication.</text>
+  <text x="86" y="405" fill="#18201C" font-family="ui-sans-serif, system-ui, sans-serif" font-size="43" font-weight="560">Shared policy. Isolated failure domains.</text>
+  <text x="86" y="515" fill="#68716C" font-family="ui-sans-serif, system-ui, sans-serif" font-size="25">Passkeys · recovery · sessions · sensitive actions</text>
+  <g transform="translate(780 112) scale(1.38)">
+    <g fill="none" stroke="#18201C" stroke-width="9" stroke-linecap="round">
+      <ellipse cx="128" cy="128" rx="79" ry="48" transform="rotate(-24 128 128)" opacity=".88"/>
+      <ellipse cx="128" cy="128" rx="79" ry="48" transform="rotate(24 128 128)" opacity=".58"/>
+    </g>
+    <circle cx="128" cy="128" r="18" fill="#2B6D4F"/>
+    <circle cx="67" cy="82" r="9" fill="#18201C"/>
+    <circle cx="190" cy="84" r="9" fill="#18201C" opacity=".72"/>
+    <circle cx="183" cy="174" r="9" fill="#18201C" opacity=".5"/>
+  </g>
+</svg>
