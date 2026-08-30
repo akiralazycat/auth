@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="A human-centered guide to authentication, recovery, sessions, and account security." />
+  <title>Auth — Human-centered account security</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Auth home">
+      <span class="brand-mark" aria-hidden="true">◌</span>
+      <span>auth</span>
+    </a>
+
+    <div class="header-right">
+      <nav aria-label="Primary navigation">
+        <a href="#principles" data-i18n="nav.principles">Principles</a>
+        <a href="#assurance" data-i18n="nav.assurance">Assurance</a>
+        <a href="#flows" data-i18n="nav.flows">Flows</a>
+        <a href="#architecture" data-i18n="nav.architecture">Architecture</a>
+      </nav>
+      <div class="language-switch" role="group" aria-label="Language">
+        <button class="lang-button is-active" type="button" data-lang="en" aria-pressed="true">EN</button>
+        <button class="lang-button" type="button" data-lang="ja" aria-pressed="false">日本語</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero shell">
+      <p class="eyebrow" data-i18n="hero.eyebrow">ACCOUNT &amp; IDENTITY DESIGN</p>
+      <h1 data-i18n="hero.title">Authentication should protect the person, not just the login form.</h1>
+      <p class="lede" data-i18n="hero.lede">A compact design guide for Passkeys, external providers, recovery, sessions, and sensitive account actions. The goal is simple: make strong account security easier to reason about, easier to maintain, and easier for users to understand.</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#principles" data-i18n="hero.ctaPrinciples">Read the principles</a>
+        <a class="button" href="#flows" data-i18n="hero.ctaFlows">Explore a flow</a>
+      </div>
+      <div class="boundary-note">
+        <span class="pulse" aria-hidden="true"></span>
+        <p><strong data-i18n="hero.boundaryStrong">Open design, isolated implementation.</strong> <span data-i18n="hero.boundaryText">Share security contracts and proven helpers. Keep product databases, secrets, OAuth clients, Passkey configuration, and session keys separate unless centralization is deliberate.</span></p>
+      </div>
+    </section>
+
+    <section class="shell intro-grid" aria-label="Core ideas">
+      <article>
+        <span class="num">01</span>
+        <h2 data-i18n="intro.identityTitle">Identity is not email</h2>
+        <p data-i18n="intro.identityText">External identities should be keyed by provider and immutable subject. Matching email addresses are not a safe automatic merge rule.</p>
+      </article>
+      <article>
+        <span class="num">02</span>
+        <h2 data-i18n="intro.recoveryTitle">Recovery is constrained</h2>
+        <p data-i18n="intro.recoveryText">A recovery link should restore a path to control, not silently mint a fully privileged account session.</p>
+      </article>
+      <article>
+        <span class="num">03</span>
+        <h2 data-i18n="intro.proofTitle">Proof should match risk</h2>
+        <p data-i18n="intro.proofText">Routine access, credential changes, and destructive authentication-root actions should not all require the same assurance.</p>
+      </article>
+    </section>
+
+    <section class="section shell model-section" aria-labelledby="model-title">
+      <div class="section-heading">
+        <p class="eyebrow" data-i18n="model.eyebrow">THE MODEL</p>
+        <h2 id="model-title" data-i18n="model.title">One security contract. Deliberately separate failure domains.</h2>
+        <p data-i18n="model.text">Consistency comes from shared policy. Resilience comes from refusing to make every product depend on the same secrets, sessions, database, or relying-party configuration.</p>
+      </div>
+
+      <div class="model-diagram" role="img" aria-labelledby="model-title model-caption">
+        <div class="model-contract">
+          <span class="diagram-kicker" data-i18n="model.contractKicker">SHARED</span>
+          <strong data-i18n="model.contractTitle">Security contract</strong>
+          <small data-i18n="model.contractText">credential semantics · assurance · recovery · session rules</small>
+        </div>
+        <div class="connector connector-a" aria-hidden="true"></div>
+        <div class="connector connector-b" aria-hidden="true"></div>
+        <div class="connector connector-c" aria-hidden="true"></div>
+        <div class="product-node product-a">
+          <span>A</span>
+          <strong data-i18n="model.product">Product</strong>
+          <small data-i18n="model.isolated">isolated secrets + sessions</small>
+        </div>
+        <div class="product-node product-b">
+          <span>B</span>
+          <strong data-i18n="model.product">Product</strong>
+          <small data-i18n="model.isolated">isolated secrets + sessions</small>
+        </div>
+        <div class="product-node product-c">
+          <span>C</span>
+          <strong data-i18n="model.product">Product</strong>
+          <small data-i18n="model.isolated">isolated secrets + sessions</small>
+        </div>
+      </div>
+      <p id="model-caption" class="diagram-caption" data-i18n="model.caption">The shared layer defines behavior. Each product keeps its own account store, OAuth clients, Passkey RP configuration, signing material, and session namespace.</p>
+    </section>
+
+    <section id="principles" class="section shell">
+      <div class="section-heading">
+        <p class="eyebrow" data-i18n="principles.eyebrow">PRINCIPLES</p>
+        <h2 data-i18n="principles.title">Twelve rules for a calmer security model.</h2>
+        <p data-i18n="principles.text">These are behavioral contracts, not framework choices. They should survive changes in UI, database, hosting, and client platform.</p>
+      </div>
+
+      <div class="principle-list">
+        <article><span>01</span><div><h3 data-i18n="p1.title">Identity is not email.</h3><p data-i18n="p1.text">Use provider + immutable subject for external identity. Treat provider email as metadata, not a merge key.</p></div></article>
+        <article><span>02</span><div><h3 data-i18n="p2.title">Login, linking, and reauthentication are different ceremonies.</h3><p data-i18n="p2.text">Bind each flow to an explicit intent, expected session, provider, expiry, and safe return path.</p></div></article>
+        <article><span>03</span><div><h3 data-i18n="p3.title">Sensitive actions deserve fresh proof.</h3><p data-i18n="p3.text">An old browser session should not automatically authorize credential or recovery changes.</p></div></article>
+        <article><span>04</span><div><h3 data-i18n="p4.title">Never let the user strand themselves.</h3><p data-i18n="p4.text">The server should reject any mutation that leaves zero usable sign-in methods.</p></div></article>
+        <article><span>05</span><div><h3 data-i18n="p5.title">Availability is not independence.</h3><p data-i18n="p5.text">Multiple synchronized Passkeys improve resilience but may still share one upstream trust root.</p></div></article>
+        <article><span>06</span><div><h3 data-i18n="p6.title">Recovery is a constrained state transition.</h3><p data-i18n="p6.text">Use a restricted recovery session until sufficient assurance has been rebuilt.</p></div></article>
+        <article><span>07</span><div><h3 data-i18n="p7.title">Recovery email is not a master key.</h3><p data-i18n="p7.text">Inbox access alone should not silently satisfy the strongest destructive-action requirements.</p></div></article>
+        <article><span>08</span><div><h3 data-i18n="p8.title">Sessions have purpose.</h3><p data-i18n="p8.text">Normal, temporary shared-device, recovery, and native sessions should carry explicit capabilities and lifetimes.</p></div></article>
+        <article><span>09</span><div><h3 data-i18n="p9.title">Active sessions and history are different data.</h3><p data-i18n="p9.text">Separate authoritative current access from historical security events.</p></div></article>
+        <article><span>10</span><div><h3 data-i18n="p10.title">Security should be legible.</h3><p data-i18n="p10.text">Show users what can sign in, what is active, what changed, and why stronger proof is required.</p></div></article>
+        <article><span>11</span><div><h3 data-i18n="p11.title">Web and native share policy.</h3><p data-i18n="p11.text">Transport can differ. Assurance, recovery, credential, and revocation semantics should not.</p></div></article>
+        <article><span>12</span><div><h3 data-i18n="p12.title">Share policy; isolate blast radius.</h3><p data-i18n="p12.text">Reuse stable contracts and helpers while keeping product credentials, databases, and cryptographic material isolated.</p></div></article>
+      </div>
+    </section>
+
+    <section id="assurance" class="section tone-band">
+      <div class="shell">
+        <div class="section-heading">
+          <p class="eyebrow" data-i18n="assurance.eyebrow">ASSURANCE</p>
+          <h2 data-i18n="assurance.title">Three levels are enough to make intent explicit.</h2>
+          <p data-i18n="assurance.text">The labels matter less than the discipline: distinguish an active session, a fresh proof, and independent proof families.</p>
+        </div>
+
+        <div class="assurance-grid">
+          <article>
+            <div class="level">A0</div>
+            <h3 data-i18n="a0.title">Active session</h3>
+            <p data-i18n="a0.text">Allowed current session is sufficient for low-risk operations.</p>
+            <ul><li data-i18n="a0.example">Example: revoke one other active device</li></ul>
+          </article>
+          <article>
+            <div class="level">A1</div>
+            <h3 data-i18n="a1.title">Fresh proof</h3>
+            <p data-i18n="a1.text">One recent credential proof. A ten-minute freshness window is a practical starting point.</p>
+            <ul>
+              <li data-i18n="a1.ex1">Add or remove one credential</li>
+              <li data-i18n="a1.ex2">Link or unlink a provider</li>
+              <li data-i18n="a1.ex3">Change recovery email</li>
+            </ul>
+          </article>
+          <article>
+            <div class="level">A2</div>
+            <h3 data-i18n="a2.title">Independent proofs</h3>
+            <p data-i18n="a2.text">Two eligible proof families for destructive authentication-root changes.</p>
+            <ul>
+              <li data-i18n="a2.ex1">Remove all Passkeys</li>
+              <li data-i18n="a2.ex2">Delete the account</li>
+              <li data-i18n="a2.ex3">Release a scarce identity root</li>
+            </ul>
+          </article>
+        </div>
+
+        <div id="action-matrix" class="matrix-wrap">
+          <div class="matrix-heading">
+            <div>
+              <h3 data-i18n="matrix.title">Sensitive-action matrix</h3>
+              <p data-i18n="matrix.text">A baseline, not a substitute for product-specific threat modeling.</p>
+            </div>
+            <a href="#flows" class="matrix-link" data-i18n="matrix.link">See these rules in motion →</a>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="matrix.action">Action</th>
+                  <th data-i18n="matrix.baseline">Baseline</th>
+                  <th data-i18n="matrix.invariant">Invariant</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td data-i18n="m1.action">Normal sign-in</td><td><span class="pill" data-i18n="m1.level">Credential</span></td><td data-i18n="m1.rule">Provider subject identifies external account</td></tr>
+                <tr><td data-i18n="m2.action">Add Passkey</td><td><span class="pill">A1</span></td><td data-i18n="m2.rule">Signup and constrained recovery are explicit exceptions</td></tr>
+                <tr><td data-i18n="m3.action">Remove one Passkey</td><td><span class="pill">A1</span></td><td data-i18n="m3.rule">Never remove the final usable method</td></tr>
+                <tr><td data-i18n="m4.action">Link / unlink provider</td><td><span class="pill">A1</span></td><td data-i18n="m4.rule">Explicit intent bound to current account/session</td></tr>
+                <tr><td data-i18n="m5.action">Change recovery email</td><td><span class="pill">A1</span></td><td data-i18n="m5.rule">Verify the new address independently</td></tr>
+                <tr><td data-i18n="m6.action">Revoke all other sessions</td><td><span class="pill">A1</span></td><td data-i18n="m6.rule">Rotate or preserve current trusted session deliberately</td></tr>
+                <tr><td data-i18n="m7.action">Remove all Passkeys</td><td><span class="pill strong">A2</span></td><td data-i18n="m7.rule">Invalidate stale step-up grants</td></tr>
+                <tr><td data-i18n="m8.action">Delete account</td><td><span class="pill strong">A2</span></td><td data-i18n="m8.rule">Destructive confirmation + audit event</td></tr>
+                <tr><td data-i18n="m9.action">Recovery replacement</td><td><span class="pill soft" data-i18n="m9.level">Restricted</span></td><td data-i18n="m9.rule">Security hold if no independent credential survives</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="flows" class="section shell flow-section">
+      <div class="section-heading">
+        <p class="eyebrow" data-i18n="flows.eyebrow">INTERACTIVE FLOWS</p>
+        <h2 data-i18n="flows.title">Walk through the moments where auth systems usually get complicated.</h2>
+        <p data-i18n="flows.text">Choose a scenario and move through it one decision at a time. The example keeps session type, assurance, and policy outcome visible as the flow changes.</p>
+      </div>
+
+      <div class="flow-tabs" role="tablist" aria-label="Authentication flow examples">
+        <button type="button" role="tab" aria-selected="true" class="flow-tab is-active" data-flow="signin" data-i18n="flowTab.signin">Sign in</button>
+        <button type="button" role="tab" aria-selected="false" class="flow-tab" data-flow="link" data-i18n="flowTab.link">Link provider</button>
+        <button type="button" role="tab" aria-selected="false" class="flow-tab" data-flow="recovery" data-i18n="flowTab.recovery">Recover access</button>
+        <button type="button" role="tab" aria-selected="false" class="flow-tab" data-flow="lastMethod" data-i18n="flowTab.lastMethod">Remove last method</button>
+        <button type="button" role="tab" aria-selected="false" class="flow-tab" data-flow="delete" data-i18n="flowTab.delete">Delete account</button>
+      </div>
+
+      <div class="flow-explorer" aria-live="polite">
+        <div class="flow-stage">
+          <div class="flow-stage-topline">
+            <span id="flow-category" class="flow-category">NORMAL ACCESS</span>
+            <span id="flow-step-counter" class="step-counter">1 / 4</span>
+          </div>
+
+          <div class="flow-visual" id="flow-visual">
+            <div class="actor-node" id="actor-user">
+              <span class="actor-icon" aria-hidden="true">●</span>
+              <span data-i18n="flow.user">User</span>
+            </div>
+            <div class="flow-line" aria-hidden="true">
+              <span class="flow-line-fill" id="flow-line-fill"></span>
+            </div>
+            <div class="actor-node" id="actor-policy">
+              <span class="actor-icon policy-icon" aria-hidden="true">◇</span>
+              <span data-i18n="flow.policy">Policy</span>
+            </div>
+            <div class="flow-line flow-line-secondary" aria-hidden="true">
+              <span class="flow-line-fill" id="flow-line-fill-2"></span>
+            </div>
+            <div class="actor-node" id="actor-account">
+              <span class="actor-icon account-icon" aria-hidden="true">□</span>
+              <span data-i18n="flow.account">Account</span>
+            </div>
+          </div>
+
+          <div class="flow-copy">
+            <p class="flow-step-label" id="flow-step-label">STEP 1</p>
+            <h3 id="flow-step-title">Choose a credential.</h3>
+            <p id="flow-step-body">A Passkey or an external provider starts the sign-in ceremony.</p>
+          </div>
+
+          <div class="flow-controls">
+            <button type="button" class="button compact" id="flow-prev" data-i18n="flow.prev">← Previous</button>
+            <button type="button" class="button compact primary" id="flow-next" data-i18n="flow.next">Next →</button>
+            <button type="button" class="text-button" id="flow-reset" data-i18n="flow.reset">Reset</button>
+          </div>
+        </div>
+
+        <aside class="flow-state" aria-label="Current flow state">
+          <div class="state-heading">
+            <p class="card-kicker" data-i18n="flow.state">CURRENT STATE</p>
+            <span class="state-dot" id="state-dot" aria-hidden="true"></span>
+          </div>
+          <dl>
+            <div>
+              <dt data-i18n="flow.session">Session</dt>
+              <dd id="flow-session">None</dd>
+            </div>
+            <div>
+              <dt data-i18n="flow.assurance">Assurance</dt>
+              <dd id="flow-assurance">Credential</dd>
+            </div>
+            <div>
+              <dt data-i18n="flow.intent">Intent</dt>
+              <dd id="flow-intent">login</dd>
+            </div>
+            <div>
+              <dt data-i18n="flow.result">Policy result</dt>
+              <dd><span id="flow-result" class="result-pill neutral">Continue</span></dd>
+            </div>
+          </dl>
+          <div class="state-rule">
+            <span data-i18n="flow.rule">Rule in focus</span>
+            <p id="flow-rule">External identity resolves by provider + immutable subject, never by matching email alone.</p>
+          </div>
+          <div class="flow-progress" id="flow-progress" aria-label="Flow progress"></div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="recovery" class="section shell">
+      <div class="section-heading">
+        <p class="eyebrow" data-i18n="recovery.eyebrow">RECOVERY &amp; SESSIONS</p>
+        <h2 data-i18n="recovery.title">Recovery should rebuild control without creating a shortcut around security.</h2>
+      </div>
+
+      <div class="split-grid">
+        <article class="feature-card">
+          <p class="card-kicker" data-i18n="recovery.cardKicker">RECOVERY</p>
+          <h3 data-i18n="recovery.cardTitle">Restricted first, normal later.</h3>
+          <p data-i18n="recovery.cardText">A recovery link can open a narrow session that inspects credential state, adds a replacement Passkey, or completes a provider reauthentication flow.</p>
+
+          <div class="recovery-diagram" role="img" aria-label="Restricted recovery session transition">
+            <div>
+              <span data-i18n="recovery.link">Recovery link</span>
+              <small data-i18n="recovery.oneUse">single use</small>
+            </div>
+            <i aria-hidden="true">→</i>
+            <div class="restricted-node">
+              <span data-i18n="recovery.restricted">Restricted session</span>
+              <small data-i18n="recovery.narrow">narrow capabilities</small>
+            </div>
+            <i aria-hidden="true">→</i>
+            <div>
+              <span data-i18n="recovery.rebuild">Rebuild proof</span>
+              <small data-i18n="recovery.hold">+ hold when required</small>
+            </div>
+            <i aria-hidden="true">→</i>
+            <div class="normal-node">
+              <span data-i18n="recovery.normal">Normal session</span>
+              <small data-i18n="recovery.afterPolicy">after policy is satisfied</small>
+            </div>
+          </div>
+
+          <div class="do-dont">
+            <div>
+              <strong data-i18n="recovery.may">May</strong>
+              <span data-i18n="recovery.may1">Inspect credential state</span>
+              <span data-i18n="recovery.may2">Add replacement credential</span>
+              <span data-i18n="recovery.may3">Continue recovery ceremony</span>
+            </div>
+            <div>
+              <strong data-i18n="recovery.mustNot">Must not</strong>
+              <span data-i18n="recovery.no1">Delete the account</span>
+              <span data-i18n="recovery.no2">Change recovery address again</span>
+              <span data-i18n="recovery.no3">Remove all credentials</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="feature-card">
+          <p class="card-kicker" data-i18n="sessions.kicker">SESSIONS</p>
+          <h3 data-i18n="sessions.title">Model purpose explicitly.</h3>
+          <div class="session-stack">
+            <div><b data-i18n="sessions.normal">Normal</b><span data-i18n="sessions.normalText">Personal-device account session</span></div>
+            <div><b data-i18n="sessions.temp">Temporary</b><span data-i18n="sessions.tempText">Short, non-sliding, no credential mutation</span></div>
+            <div><b data-i18n="sessions.recovery">Recovery</b><span data-i18n="sessions.recoveryText">Narrow capabilities for restoring access</span></div>
+            <div><b data-i18n="sessions.native">Native</b><span data-i18n="sessions.nativeText">Secure token transport, same policy model</span></div>
+          </div>
+
+          <div class="session-note">
+            <strong data-i18n="sessions.noteTitle">Same policy, different transport.</strong>
+            <p data-i18n="sessions.noteText">A browser cookie and a native bearer token can represent different transport choices without changing what the account is allowed to do.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="architecture" class="section architecture-band">
+      <div class="shell architecture-grid">
+        <div class="section-heading">
+          <p class="eyebrow" data-i18n="architecture.eyebrow">ARCHITECTURE</p>
+          <h2 data-i18n="architecture.title">Share the contract. Keep the failure domains deliberate.</h2>
+          <p data-i18n="architecture.text">Common policy reduces drift. Isolation prevents one product compromise from automatically becoming every product compromise.</p>
+        </div>
+
+        <div class="boundary-grid">
+          <article>
+            <p class="card-kicker" data-i18n="architecture.share">GOOD TO SHARE</p>
+            <ul>
+              <li data-i18n="architecture.share1">Credential semantics</li>
+              <li data-i18n="architecture.share2">OAuth intent model</li>
+              <li data-i18n="architecture.share3">Step-up policy</li>
+              <li data-i18n="architecture.share4">Recovery lifecycle helpers</li>
+              <li data-i18n="architecture.share5">Session-kind semantics</li>
+              <li data-i18n="architecture.share6">Security-event vocabulary</li>
+              <li data-i18n="architecture.share7">Conformance fixtures</li>
+            </ul>
+          </article>
+
+          <article>
+            <p class="card-kicker" data-i18n="architecture.isolate">KEEP ISOLATED</p>
+            <ul>
+              <li data-i18n="architecture.iso1">Account databases</li>
+              <li data-i18n="architecture.iso2">OAuth secrets and private keys</li>
+              <li data-i18n="architecture.iso3">Passkey RP configuration</li>
+              <li data-i18n="architecture.iso4">Session and encryption keys</li>
+              <li data-i18n="architecture.iso5">Cookie domains</li>
+              <li data-i18n="architecture.iso6">Product migrations</li>
+              <li data-i18n="architecture.iso7">Product-specific identity rows</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section shell checklist">
+      <div class="section-heading">
+        <p class="eyebrow" data-i18n="check.eyebrow">REVIEW CHECKLIST</p>
+        <h2 data-i18n="check.title">Before calling an auth flow finished.</h2>
+      </div>
+
+      <div class="check-grid">
+        <p data-i18n="check.1">Does external identity use immutable provider subject?</p>
+        <p data-i18n="check.2">Can a callback distinguish login, link, and reauth?</p>
+        <p data-i18n="check.3">Can the last usable sign-in method be removed?</p>
+        <p data-i18n="check.4">Do sensitive actions require fresh proof?</p>
+        <p data-i18n="check.5">Are destructive root changes stronger than routine settings?</p>
+        <p data-i18n="check.6">Does recovery create a restricted state first?</p>
+        <p data-i18n="check.7">Can temporary sessions mutate credentials?</p>
+        <p data-i18n="check.8">Are active sessions distinct from audit history?</p>
+        <p data-i18n="check.9">Does native preserve the same action policy?</p>
+        <p data-i18n="check.10">Are secrets and relying-party configuration isolated per product?</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer shell">
+    <p><strong>auth</strong> <span data-i18n="footer.left">— an open design guide, not an authentication SDK.</span></p>
+    <p data-i18n="footer.right">Security is contextual. Treat these rules as a review baseline, then threat-model your product.</p>
+  </footer>
+
+  <script src="./script.js"></script>
+</body>
+</html>

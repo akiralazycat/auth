@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+<title id="title">auth mark</title>
+<desc id="desc">A central point surrounded by two intersecting trust orbits and three proof nodes.</desc>
+<rect width="256" height="256" rx="56" fill="#F4F6F2"/>
+<g fill="none" stroke="#18201C" stroke-width="10" stroke-linecap="round">
+  <ellipse cx="128" cy="128" rx="79" ry="48" transform="rotate(-24 128 128)" opacity=".88"/>
+  <ellipse cx="128" cy="128" rx="79" ry="48" transform="rotate(24 128 128)" opacity=".58"/>
+</g>
+<circle cx="128" cy="128" r="18" fill="#2B6D4F"/>
+<circle cx="67" cy="82" r="9" fill="#18201C"/>
+<circle cx="190" cy="84" r="9" fill="#18201C" opacity=".72"/>
+<circle cx="183" cy="174" r="9" fill="#18201C" opacity=".5"/>
+</svg>
