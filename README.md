@@ -31,6 +31,23 @@ The repository includes a dependency-free static site designed to be portable to
 
 English is the default public language. Japanese can be switched in-place without navigating to a second page.
 
+### Local preview
+
+From the repository root, serve the files with Python 3 and open `http://127.0.0.1:8765/` in a browser. The site has no build step or package installation.
+
+```sh
+python3 -m http.server 8765 --bind 127.0.0.1
+```
+
+- Check that the page starts in English. Switch languages and confirm that the page and current step change language while the flow stays at the same step.
+- Move forward and back in the Flow Explorer and use Reset to return to step 1. Check the session, assurance, and policy result at the changed steps.
+- Open both [direct-link examples](#direct-links) on the local origin. Copy a link from the explorer and reopen it to check that the flow, step, and language are restored. Use localhost or HTTPS when checking clipboard access.
+- At a narrow viewport, check the navigation and flow controls for clipping. Check browser Network and Console for missing files or script errors.
+
+### Static hosting
+
+Serve `index.html` from the site root and keep the relative paths of the stylesheets, scripts, and assets. Include `styles-base.css` and `brand.css` for the stylesheet loader and `script-base.js` and `deeplinks.js` for the script loader. After publishing, check the production URL and the same direct links over HTTPS. See [ChatGPT Sites direction](#chatgpt-sites-direction) for guidance on porting the presentation.
+
 ### Formal public mark
 
 The public identity uses a central control point surrounded by two intersecting trust orbits and three proof nodes. The mark is intended to suggest durable human control, multiple proof families, and deliberate trust boundaries rather than a conventional lock/shield security logo.
